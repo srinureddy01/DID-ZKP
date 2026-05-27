@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "ipfs-http-client": "^60.0.0",
+    "buffer": "^6.0.3"
+  }
+}
