@@ -1,0 +1,47 @@
+/* frontend/src/styles/themes.css */
+
+/* Light Theme (Default) */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --text-primary: #1a1a2e;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  --accent-color: #667eea;
+  --accent-hover: #5a67d8;
+  --success-color: #4caf50;
+  --error-color: #f44336;
+  --warning-color: #ff9800;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Dark Theme */
+.dark-mode {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0b0;
+  --border-color: #2d2d4e;
+  --accent-color: #667eea;
+  --accent-hover: #7c8ef0;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+body.dark-mode {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Apply theme variables */
+.app-header,
+.app-footer,
+.welcome-card,
+.warning-card,
+.dashboard-card {
+  background: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
