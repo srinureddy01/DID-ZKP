@@ -1,0 +1,44 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - BLOCKCHAIN_RPC_URL=http://ganache:8545
+      - IPFS_HOST=ipfs
+    depends_on:
+      - ganache
+      - ipfs
+    networks:
+      - did-network
+
+  ganache:
+    image: trufflesuite/ganache:latest
+    ports:
+      - "8545:8545"
+    command: >
+      --chain.chainId 31337
+      --chain.networkId 31337
+      --wallet.mnemonic "test test test test test test test test test test test junk"
+    networks:
+      - did-network
+
+  ipfs:
+    image: ipfs/kubo:latest
+    ports:
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - ipfs-data:/data/ipfs
+    networks:
+      - did-network
+
+volumes:
+  ipfs-data:
+
+networks:
+  did-network:
+    driver: bridge
