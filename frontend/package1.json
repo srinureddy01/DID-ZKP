@@ -1,0 +1,47 @@
+// root package.json (optional, for monorepo structure)
+{
+  "name": "did-protocol",
+  "version": "1.0.0",
+  "description": "Decentralized Identity Protocol with Zero-Knowledge Proofs",
+  "author": "DID Protocol Team",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "contracts"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:contracts\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && go run main.go",
+    "dev:contracts": "cd contracts && npx hardhat node",
+    "build": "npm run build:frontend && npm run build:contracts",
+    "build:frontend": "cd frontend && npm run build",
+    "build:contracts": "cd contracts && npx hardhat compile",
+    "test": "npm run test:frontend && npm run test:contracts",
+    "test:frontend": "cd frontend && npm run test",
+    "test:contracts": "cd contracts && npx hardhat test",
+    "deploy": "cd contracts && npx hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "cd contracts && npx hardhat run scripts/deploy.js --network sepolia",
+    "deploy:mainnet": "cd contracts && npx hardhat run scripts/deploy.js --network mainnet",
+    "clean": "rm -rf node_modules frontend/node_modules contracts/node_modules",
+    "setup": "npm install && cd frontend && npm install && cd ../contracts && npm install",
+    "circuits:compile": "cd circuits && ./compile.sh",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "lint": "npm run lint:frontend && npm run lint:contracts",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:contracts": "cd contracts && npx solhint 'contracts/**/*.sol'",
+    "format": "prettier --write '**/*.{js,jsx,sol,json,md}'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.1.0",
+    "husky": "^8.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
