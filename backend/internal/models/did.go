@@ -91,3 +91,69 @@ func UpdateDIDDocument(existingDoc map[string]interface{}, updates map[string]in
 	existingDoc["updated"] = time.Now().Format(time.RFC3339)
 	return existingDoc
 }
+// backend/internal/models/did.go (add these types)
+
+type DIDComponents struct {
+	Scheme     string `json:"scheme"`
+	Method     string `json:"method"`
+	Identifier string `json:"identifier"`
+	Did        string `json:"did"`
+}
+
+type DIDMetadata struct {
+	Owner           string    `json:"owner"`
+	Created         time.Time `json:"created"`
+	Updated         time.Time `json:"updated"`
+	IsActive        bool      `json:"isActive"`
+	DocumentHash    string    `json:"documentHash"`
+	BlockNumber     uint64    `json:"blockNumber,omitempty"`
+	TransactionHash string    `json:"transactionHash,omitempty"`
+}
+
+type DIDResolutionResult struct {
+	DID            string                 `json:"did"`
+	Document       map[string]interface{} `json:"document"`
+	DocumentHash   string                 `json:"documentHash"`
+	Metadata       *DIDMetadata           `json:"metadata"`
+	ResolutionTime time.Time              `json:"resolutionTime"`
+	Method         string                 `json:"method"`
+	Identifier     string                 `json:"identifier"`
+}
+
+type DIDMetadataResponse struct {
+	DID          string    `json:"did"`
+	Owner        string    `json:"owner"`
+	Created      time.Time `json:"created"`
+	Updated      time.Time `json:"updated"`
+	IsActive     bool      `json:"isActive"`
+	DocumentHash string    `json:"documentHash"`
+}
+
+type DIDVerificationResponse struct {
+	DID      string `json:"did"`
+	Exists   bool   `json:"exists"`
+	IsActive bool   `json:"isActive"`
+	Owner    string `json:"owner"`
+	Verified bool   `json:"verified"`
+}
+
+type BatchResolutionResponse struct {
+	Results  []*DIDResolutionResult `json:"results"`
+	Errors   map[string]string      `json:"errors"`
+	Total    int                    `json:"total"`
+	Resolved int                    `json:"resolved"`
+}
+
+type DIDHistoryResponse struct {
+	DID     string                   `json:"did"`
+	Entries []map[string]interface{} `json:"entries"`
+	Count   int                      `json:"count"`
+}
+
+type DIDResolutionWithProofResponse struct {
+	DID        string                 `json:"did"`
+	Document   map[string]interface{} `json:"document"`
+	Metadata   *DIDMetadata           `json:"metadata"`
+	Proof      map[string]interface{} `json:"proof"`
+	VerifiedAt time.Time              `json:"verifiedAt"`
+}
