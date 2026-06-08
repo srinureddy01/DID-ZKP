@@ -1,0 +1,1 @@
+in this text the .env and outher things will be noted.
