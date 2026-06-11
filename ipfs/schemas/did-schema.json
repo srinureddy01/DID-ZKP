@@ -1,0 +1,490 @@
+ 
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://www.w3.org/ns/did/v1/schema",
+  "$comment": "DID Document JSON Schema - W3C DID Core Specification Compliance",
+  "title": "DID Document Schema",
+  "description": "JSON Schema for validating Decentralized Identifier (DID) Documents according to W3C DID Core v1.0",
+  "version": "1.0.0",
+  
+  "definitions": {
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:[a-zA-Z0-9_.%-]+$",
+      "description": "DID string following the format did:method:identifier",
+      "examples": ["did:example:123456789abcdefghi", "did:ethr:0x1234567890123456789012345678901234567890"]
+    },
+    
+    "didUrl": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:[a-zA-Z0-9_.%-]+(?:/[a-zA-Z0-9_.%-]+)*(?:\\?[^#]*)?(?:#.*)?$",
+      "description": "DID URL with optional path, query, and fragment components",
+      "examples": ["did:example:123#keys-1", "did:example:123/path?query=value#fragment"]
+    },
+    
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
+      "description": "ISO 8601 UTC timestamp",
+      "examples": ["2024-01-01T00:00:00Z", "2024-06-15T10:30:00Z"]
+    },
+    
+    "publicKeyMultibase": {
+      "type": "string",
+      "pattern": "^z[1-9A-HJ-NP-Za-km-z]{44,}$",
+      "description": "Multibase encoded public key (base58btc with multicodec prefix)",
+      "examples": ["z6MkpTHR8VNsDJxQAAaE2nZr3YQnW5zF6E1qykXqkZjqZqv4"]
+    },
+    
+    "verificationMethod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/didUrl",
+          "description": "Verification method ID (DID URL with fragment)"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Ed25519VerificationKey2020",
+            "Ed25519VerificationKey2018",
+            "EcdsaSecp256k1VerificationKey2019",
+            "EcdsaSecp256k1RecoveryMethod2020",
+            "JsonWebKey2020",
+            "X25519KeyAgreementKey2019",
+            "RsaVerificationKey2018",
+            "EcdsaSecp256r1VerificationKey2019"
+          ],
+          "description": "Type of verification method"
+        },
+        "controller": {
+          "$ref": "#/definitions/did",
+          "description": "DID that controls this verification method"
+        },
+        "publicKeyMultibase": {
+          "$ref": "#/definitions/publicKeyMultibase",
+          "description": "Multibase encoded public key"
+        },
+        "publicKeyJwk": {
+          "type": "object",
+          "properties": {
+            "kty": { "type": "string" },
+            "crv": { "type": "string" },
+            "x": { "type": "string" },
+            "y": { "type": "string" },
+            "d": { "type": "string" }
+          },
+          "additionalProperties": true,
+          "description": "JSON Web Key representation"
+        },
+        "blockchainAccountId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9]+:[a-zA-Z0-9]+:(?:0x)?[a-fA-F0-9]{40}$",
+          "description": "Blockchain account identifier (e.g., eip155:1:0x...)",
+          "examples": ["eip155:1:0x1234567890123456789012345678901234567890"]
+        },
+        "ethereumAddress": {
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]{40}$",
+          "description": "Ethereum address",
+          "examples": ["0x1234567890123456789012345678901234567890"]
+        }
+      },
+      "required": ["id", "type", "controller"],
+      "anyOf": [
+        { "required": ["publicKeyMultibase"] },
+        { "required": ["publicKeyJwk"] },
+        { "required": ["blockchainAccountId"] },
+        { "required": ["ethereumAddress"] }
+      ],
+      "additionalProperties": false
+    },
+    
+    "service": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/didUrl",
+          "description": "Service endpoint ID"
+        },
+        "type": {
+          "type": "string",
+          "description": "Service type (e.g., 'LinkedDomains', 'IdentityHub', 'DIDCommMessaging')",
+          "examples": ["LinkedDomains", "IdentityHub", "DIDCommMessaging", "CredentialRepository"]
+        },
+        "serviceEndpoint": {
+          "anyOf": [
+            { "type": "string", "format": "uri" },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          ],
+          "description": "Service endpoint URL or map of URLs"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Human-readable description of the service"
+        },
+        "routingKeys": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Routing keys for the service"
+        },
+        "accept": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "MIME types accepted by the service"
+        }
+      },
+      "required": ["id", "type", "serviceEndpoint"],
+      "additionalProperties": true
+    },
+    
+    "profile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Display name"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Description or bio"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address"
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "description": "Website URL"
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri",
+          "description": "Avatar image URL (ipfs:// or https://)"
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Geographic location"
+        },
+        "social": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Social media links"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/timestamp",
+          "description": "Profile creation timestamp"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/timestamp",
+          "description": "Profile last update timestamp"
+        }
+      },
+      "additionalProperties": true
+    },
+    
+    "proof": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Ed25519Signature2020",
+            "Ed25519Signature2018",
+            "EcdsaSecp256k1Signature2019",
+            "JsonWebSignature2020"
+          ],
+          "description": "Proof type"
+        },
+        "created": {
+          "$ref": "#/definitions/timestamp",
+          "description": "Proof creation timestamp"
+        },
+        "verificationMethod": {
+          "$ref": "#/definitions/didUrl",
+          "description": "Verification method used to create proof"
+        },
+        "proofPurpose": {
+          "type": "string",
+          "enum": [
+            "authentication",
+            "assertionMethod",
+            "keyAgreement",
+            "capabilityInvocation",
+            "capabilityDelegation"
+          ],
+          "description": "Purpose of the proof"
+        },
+        "proofValue": {
+          "type": "string",
+          "description": "The proof value (signature)"
+        },
+        "jws": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]*\\.[A-Za-z0-9_-]+$",
+          "description": "JSON Web Signature (JWS)"
+        }
+      },
+      "required": ["type", "created", "verificationMethod", "proofPurpose"],
+      "oneOf": [
+        { "required": ["proofValue"] },
+        { "required": ["jws"] }
+      ]
+    }
+  },
+  
+  "type": "object",
+  "properties": {
+    "@context": {
+      "anyOf": [
+        { "type": "string", "const": "https://www.w3.org/ns/did/v1" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "type": "string", "const": "https://www.w3.org/ns/did/v1" },
+              { "type": "string" },
+              { "type": "object" }
+            ]
+          },
+          "minItems": 1
+        }
+      ],
+      "description": "JSON-LD context for the DID document"
+    },
+    
+    "id": {
+      "$ref": "#/definitions/did",
+      "description": "The DID this document describes"
+    },
+    
+    "controller": {
+      "anyOf": [
+        { "$ref": "#/definitions/did" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/did" },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      ],
+      "description": "DID(s) that control this DID"
+    },
+    
+    "alsoKnownAs": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/did" },
+          { "type": "string", "format": "uri" }
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Other identifiers this DID is known by"
+    },
+    
+    "verificationMethod": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/verificationMethod" },
+      "uniqueItems": true,
+      "description": "Public keys and other verification methods"
+    },
+    
+    "authentication": {
+      "anyOf": [
+        { "$ref": "#/definitions/didUrl" },
+        { "$ref": "#/definitions/verificationMethod" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/didUrl" },
+              { "$ref": "#/definitions/verificationMethod" }
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      ],
+      "description": "Verification methods for authentication"
+    },
+    
+    "assertionMethod": {
+      "anyOf": [
+        { "$ref": "#/definitions/didUrl" },
+        { "$ref": "#/definitions/verificationMethod" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/didUrl" },
+              { "$ref": "#/definitions/verificationMethod" }
+            ]
+          },
+          "uniqueItems": true
+        }
+      ],
+      "description": "Verification methods for assertions (e.g., issuing credentials)"
+    },
+    
+    "keyAgreement": {
+      "anyOf": [
+        { "$ref": "#/definitions/didUrl" },
+        { "$ref": "#/definitions/verificationMethod" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/didUrl" },
+              { "$ref": "#/definitions/verificationMethod" }
+            ]
+          },
+          "uniqueItems": true
+        }
+      ],
+      "description": "Verification methods for key agreement (encryption)"
+    },
+    
+    "capabilityInvocation": {
+      "anyOf": [
+        { "$ref": "#/definitions/didUrl" },
+        { "$ref": "#/definitions/verificationMethod" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/didUrl" },
+              { "$ref": "#/definitions/verificationMethod" }
+            ]
+          },
+          "uniqueItems": true
+        }
+      ],
+      "description": "Verification methods for capability invocation"
+    },
+    
+    "capabilityDelegation": {
+      "anyOf": [
+        { "$ref": "#/definitions/didUrl" },
+        { "$ref": "#/definitions/verificationMethod" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/didUrl" },
+              { "$ref": "#/definitions/verificationMethod" }
+            ]
+          },
+          "uniqueItems": true
+        }
+      ],
+      "description": "Verification methods for capability delegation"
+    },
+    
+    "service": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/service" },
+      "uniqueItems": true,
+      "description": "Service endpoints"
+    },
+    
+    "created": {
+      "$ref": "#/definitions/timestamp",
+      "description": "DID document creation timestamp"
+    },
+    
+    "updated": {
+      "$ref": "#/definitions/timestamp",
+      "description": "DID document last update timestamp"
+    },
+    
+    "profile": {
+      "$ref": "#/definitions/profile",
+      "description": "Optional profile information attached to the DID"
+    },
+    
+    "proof": {
+      "anyOf": [
+        { "$ref": "#/definitions/proof" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/proof" }
+        }
+      ],
+      "description": "Proof(s) for the DID document"
+    }
+  },
+  
+  "required": ["@context", "id"],
+  
+  "dependencies": {
+    "created": ["updated"],
+    "profile": ["created", "updated"]
+  },
+  
+  "allOf": [
+    {
+      "if": {
+        "properties": { "verificationMethod": { "minItems": 1 } }
+      },
+      "then": {
+        "anyOf": [
+          { "required": ["authentication"] },
+          { "required": ["assertionMethod"] }
+        ]
+      }
+    }
+  ],
+  
+  "examples": [
+    {
+      "@context": "https://www.w3.org/ns/did/v1",
+      "id": "did:example:123456789abcdefghi",
+      "controller": "did:example:123456789abcdefghi",
+      "verificationMethod": [
+        {
+          "id": "did:example:123456789abcdefghi#keys-1",
+          "type": "Ed25519VerificationKey2020",
+          "controller": "did:example:123456789abcdefghi",
+          "publicKeyMultibase": "z6MkpTHR8VNsDJxQAAaE2nZr3YQnW5zF6E1qykXqkZjqZqv4"
+        }
+      ],
+      "authentication": [
+        "did:example:123456789abcdefghi#keys-1"
+      ],
+      "assertionMethod": [
+        "did:example:123456789abcdefghi#keys-1"
+      ],
+      "service": [
+        {
+          "id": "did:example:123456789abcdefghi#website",
+          "type": "LinkedDomains",
+          "serviceEndpoint": "https://example.com"
+        }
+      ],
+      "profile": {
+        "name": "Example User",
+        "description": "Example DID Document for demonstration",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-01-01T00:00:00Z"
+      },
+      "created": "2024-01-01T00:00:00Z",
+      "updated": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+
