@@ -1,0 +1,37 @@
+ 
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://did-protocol.io/schemas/did-resolution-result/v1",
+  "title": "DID Resolution Result Schema",
+  "description": "Schema for DID resolution results according to DID Core specification",
+  
+  "type": "object",
+  "properties": {
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:[a-zA-Z0-9_.%-]+$"
+    },
+    "didDocument": {
+      "$ref": "did-schema.json#"
+    },
+    "didDocumentMetadata": {
+      "type": "object",
+      "properties": {
+        "created": { "type": "string", "format": "date-time" },
+        "updated": { "type": "string", "format": "date-time" },
+        "deactivated": { "type": "boolean" },
+        "versionId": { "type": "string" },
+        "nextUpdate": { "type": "string", "format": "date-time" }
+      }
+    },
+    "didResolutionMetadata": {
+      "type": "object",
+      "properties": {
+        "contentType": { "type": "string" },
+        "error": { "type": "string" },
+        "retrieved": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "required": ["did"]
+}
