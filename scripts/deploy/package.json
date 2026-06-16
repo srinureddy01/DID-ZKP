@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "deploy": "hardhat run scripts/deploy/deploy_contracts.js --network localhost",
+    "deploy:sepolia": "hardhat run scripts/deploy/deploy_contracts.js --network sepolia",
+    "deploy:goerli": "hardhat run scripts/deploy/deploy_contracts.js --network goerli",
+    "deploy:mainnet": "hardhat run scripts/deploy/deploy_contracts.js --network mainnet",
+    "deploy:verify": "hardhat run scripts/deploy/deploy_contracts.js --network sepolia && hardhat verify"
+  }
+}
