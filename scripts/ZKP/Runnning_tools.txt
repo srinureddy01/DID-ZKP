@@ -1,0 +1,11 @@
+# Compile all circuits
+./scripts/zkp/compile_circuits.sh
+
+# Clean and recompile
+./scripts/zkp/compile_circuits.sh --clean
+
+# Test circuits
+./scripts/zkp/test_circuits.sh
+
+# Individual circuit compilation (via script)
+# The script automatically compiles all circuits defined in the array
