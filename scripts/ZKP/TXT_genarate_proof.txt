@@ -1,0 +1,14 @@
+# Generate age proof
+node generate_proof.js age 2000-01-01 18
+
+# Generate identity proof
+node generate_proof.js identity
+
+# Verify a proof
+node generate_proof.js verify proof.json
+
+# Generate batch of proofs
+node generate_proof.js batch 10
+
+# Show help
+node generate_proof.js help
